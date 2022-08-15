@@ -1,5 +1,6 @@
 'use strict'
 const axios = require('axios')
+const ffMultipart = require('@fastify/multipart')
 
 /*
  * Copyright 2019 Mia srl
@@ -21,6 +22,7 @@ const axios = require('axios')
 const customService = require('@mia-platform/custom-plugin-lib')()
 /* eslint-disable-next-line no-unused-vars */
 module.exports = customService(async function index(service) {
+  service.register(ffMultipart)
   service.addRawCustomPlugin('POST', '/', async(request, reply) => {
     const { ddforward, ...query } = request.query
     await axios({
@@ -30,6 +32,7 @@ module.exports = customService(async function index(service) {
       data: request.body,
       headers: {
         'x-forwarded-for': request.headers['x-forwarded-for'] || request?.raw?.socket?.remoteAddress,
+        'Content-Type': request.headers['content-type'],
       },
     })
 
